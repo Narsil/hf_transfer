@@ -3,6 +3,8 @@ use pyo3::prelude::*;
 use reqwest::header::{CONTENT_LENGTH, RANGE};
 use std::io::SeekFrom;
 use std::sync::Arc;
+use std::path::Path;
+use std::fs::remove_file;
 
 use tokio::io::AsyncSeekExt;
 use tokio::io::AsyncWriteExt;
@@ -14,7 +16,18 @@ fn download(url: String, filename: String, max_files: usize, chunk_size: usize) 
     tokio::runtime::Builder::new_multi_thread()
         .enable_all()
         .build()?
-        .block_on(async { download_async(url, filename, max_files, chunk_size).await })
+        .block_on(async { download_async(url, filename.clone(), max_files, chunk_size).await })
+        .map_err(|err| {
+            let path = Path::new(&filename);
+            if path.exists() {
+                match remove_file(filename){
+                    Ok(_) => err,
+                    Err(err) => {return PyException::new_err(format!("Error while removing corrupted file: {err:?}"));}
+                }
+            }else{
+                err
+            }
+        })
 }
 
 async fn download_async(
@@ -65,7 +78,7 @@ async fn download_async(
     let results: Vec<Result<PyResult<()>, tokio::task::JoinError>> =
         futures::future::join_all(handles).await;
     let results: PyResult<()> = results.into_iter().flatten().collect();
-    let _ = results?;
+    results?;
 
     // let size = length as f64 / 1024.0 / 1024.0;
     // let speed = size / start.elapsed().as_secs_f64();
