@@ -11,5 +11,5 @@ crate-type = ["cdylib"]
 [dependencies]
 futures = "0.3.25"
 pyo3 = { version = "0.17.3", features = ["extension-module"] }
-reqwest = "0.11.13"
+reqwest = { version = "0.11.13", features = ["rustls-tls"] }
 tokio = { version = "1.23.0", features = ["rt", "rt-multi-thread", "fs"] }
