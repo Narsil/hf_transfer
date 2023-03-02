@@ -18,7 +18,6 @@ jobs:
         manylinux: auto
         command: build
         args: --release --sdist -o dist --find-interpreter
-        container: off # run on host to have openssl
     - name: Upload wheels
       uses: actions/upload-artifact@v3
       with:

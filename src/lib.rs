@@ -21,8 +21,7 @@ fn download(url: String, filename: String, max_files: usize, chunk_size: usize) 
             let path = Path::new(&filename);
             if path.exists() {
                 remove_file(filename)
-                    .map_err(|err| panic!("Error while removing corrupted file: {:?}", err))
-                    .unwrap();
+                    .expect(format!("Error while removing corrupted file: {err:?}"));
             }
             err
         })
