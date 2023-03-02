@@ -20,10 +20,13 @@ fn download(url: String, filename: String, max_files: usize, chunk_size: usize) 
         .map_err(|err| {
             let path = Path::new(&filename);
             if path.exists() {
-                remove_file(filename)
-                    .expect(format!("Error while removing corrupted file: {err:?}"));
+                match remove_file(filename){
+                    Ok(_) => err,
+                    Err(err) => {return PyException::new_err(format!("Error while removing corrupted file: {err:?}"));}
+                }
+            }else{
+                err
             }
-            err
         })
 }
 
