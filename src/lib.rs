@@ -78,7 +78,7 @@ async fn download_async(
     let results: Vec<Result<PyResult<()>, tokio::task::JoinError>> =
         futures::future::join_all(handles).await;
     let results: PyResult<()> = results.into_iter().flatten().collect();
-    let _ = results?;
+    results?;
 
     // let size = length as f64 / 1024.0 / 1024.0;
     // let speed = size / start.elapsed().as_secs_f64();
